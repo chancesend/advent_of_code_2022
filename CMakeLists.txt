@@ -16,15 +16,19 @@ include(GoogleTest)
 enable_testing()
 
 add_library(current_day
-        day_5.h)
+        day_8.h
+        )
 set_target_properties(current_day PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(
         current_tests
-        Test_Day_5.cpp
+        Test_Day_8.cpp
 )
 
 add_library(previous_days
+        day_7.h
+        day_6.h
+        day_5.h
         day_4.h
         day_3.h
         day_2.h
@@ -33,6 +37,9 @@ set_target_properties(previous_days PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(
         previous_tests
+        Test_Day_7.cpp
+        Test_Day_6.cpp
+        Test_day_5.cpp
         Test_day_4.cpp
         Test_Day_3.cpp
         Test_Day_2.cpp
