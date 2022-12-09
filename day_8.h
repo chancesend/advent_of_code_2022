@@ -25,10 +25,7 @@ namespace Day8 {
 
         TreeMap() : _map() {}
         TreeMap(Dims dims) : _map(dims.first) {
-            for(auto& row: _map)
-            {
-                row.resize(dims.second);
-            }
+            std::for_each(_map.begin(), _map.end(), [col=dims.second](auto& row){row.resize(col);});
         }
 
         Vec row(int i) const
@@ -93,8 +90,9 @@ namespace Day8 {
         for (int i = 0; i < map.getDims().first; ++i)
         {
             auto mapRow = map.row(i);
-            auto thisSum = std::accumulate(mapRow.cbegin(), mapRow.cend(), 0, [](int acc, int val) -> int {
-                return acc + val;
+            auto thisSum = std::accumulate(mapRow.cbegin(), mapRow.cend(), 0, [](int&& acc, int val) {
+                acc += val;
+                return std::move(acc);
             });
             sum += thisSum;
         }
@@ -117,6 +115,19 @@ namespace Day8 {
             // Look at trees from all 4 directions to calculate the visibleMatrix
             TreeMap visibleMap(_treemapDims);
 
+            auto maxFcn = [](int l, int r)
+            {
+                return std::max(l, r);
+            };
+            auto visibilityFcn = [](int l, int r)
+            {
+                return l > r ? l : -1;
+            };
+
+            // Ugh, I'd really like to refactor this into reusable sections,
+            // probably by making the matrix rotatable, but
+            // I'd probably need to redo the original tree matrix data structure.
+
             // North
             {
                 TreeMap visibleThisDir(_treemapDims);
@@ -126,16 +137,10 @@ namespace Day8 {
                 {
                     TreeMap::Vec vec = _treemap.row(i);
                     TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), [](int l, int r)
-                    {
-                        return l > r ? l : -1;
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
                     visibleThisDir.setRow(i, visibleResult);
 
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), [](int l, int r)
-                    {
-                        return std::max(l, r);
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
                 }
                 updateVisibleMap(visibleMap, visibleThisDir);
             }
@@ -148,16 +153,10 @@ namespace Day8 {
                 {
                     TreeMap::Vec vec = _treemap.row(i);
                     TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), [&](int l, int r)
-                    {
-                        return l > r ? l : -1;
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
                     visibleThisDir.setRow(i, visibleResult);
 
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), [](int l, int r)
-                    {
-                        return std::max(l, r);
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
                 }
                 updateVisibleMap(visibleMap, visibleThisDir);
             }
@@ -170,16 +169,10 @@ namespace Day8 {
                 {
                     TreeMap::Vec vec = _treemap.col(i);
                     TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), [&](int l, int r)
-                    {
-                        return l > r ? l : -1;
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
                     visibleThisDir.setCol(i, visibleResult);
 
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), [](int l, int r)
-                    {
-                        return std::max(l, r);
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
                 }
                 updateVisibleMap(visibleMap, visibleThisDir);
             }
@@ -192,16 +185,10 @@ namespace Day8 {
                 {
                     TreeMap::Vec vec = _treemap.col(i);
                     TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), [&](int l, int r)
-                    {
-                        return l > r ? l : -1;
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
                     visibleThisDir.setCol(i, visibleResult);
 
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), [](int l, int r)
-                    {
-                        return std::max(l, r);
-                    });
+                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
                 }
                 updateVisibleMap(visibleMap, visibleThisDir);
             }
