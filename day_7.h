@@ -31,23 +31,22 @@ namespace Day7 {
 
         int getSize() const
         {
-            int size = 0;
-            for(const auto& file: _files)
-            {
-                size += file.size;
-            }
-            for (const auto& dir: _subdirs)
-            {
-                size += dir.getSize();
-            }
+            auto size = std::accumulate(_files.begin(), _files.end(), 0, [](int&& acc, const File& file){
+                acc += file.size;
+                return acc;
+            });
+            size += std::accumulate(_subdirs.begin(), _subdirs.end(), 0, [](int&& acc, const Dir& dir){
+                acc += dir.getSize();
+                return acc;
+            });
             return size;
         }
-        std::string getName() const
+        const std::string& getName() const
         {
             return _name;
         }
 
-        Dirs& subDirs()
+        const Dirs& subDirs() const
         {
             return _subdirs;
         }
@@ -67,17 +66,15 @@ namespace Day7 {
             _subdirs.push_back(Dir(name, this));
             return &_subdirs.back();
         }
-        Dir* cd(const std::string& name)
+        Dir* subdir(const std::string& name)
         {
             if (name == "..")
             {
                 return _parent;
             }
-            else
-            {
-                auto subdir = std::find_if(_subdirs.begin(), _subdirs.end(), [name](Dir& dir){ return dir.getName() == name;});
-                return &subdir[0];
-            }
+
+            auto subdir = std::find_if(_subdirs.begin(), _subdirs.end(), [name](Dir& dir){ return dir.getName() == name;});
+            return &subdir[0];
         }
 
 
@@ -93,8 +90,8 @@ namespace Day7 {
 
         FileSystem() : _root(kRoot, nullptr), _curDir(&_root) {}
 
-        Dir* dir(const std::string& name) {
-            return _root.cd(name);
+        Dir& dir(const std::string& name) {
+            return *_root.subdir(name);
         }
 
         Dir& cd(const std::string& name)
@@ -109,10 +106,11 @@ namespace Day7 {
                 _curDir = &_curDir->getParent();
                 return *_curDir;
             }
-            auto found = std::find_if(_curDir->subDirs().begin(), _curDir->subDirs().end(), [name](Dir& subdir){
+
+            auto found = std::find_if(_curDir->subDirs().cbegin(), _curDir->subDirs().cend(), [name](const Dir& subdir){
                 return subdir.getName() == name;
             });
-            if (found == _curDir->subDirs().end())
+            if (found == _curDir->subDirs().cend())
             {
                 // New directory
                 auto newDir = _curDir->mkDir(name);
@@ -120,7 +118,7 @@ namespace Day7 {
             }
             else
             {
-                _curDir = _curDir->cd(name);
+                _curDir = _curDir->subdir(name);
                 return *_curDir;
             }
         }
@@ -155,16 +153,14 @@ namespace Day7 {
 
         using TerminalLineList = std::vector<std::string>;
 
-        DirectorySizeList getListOfDirectorySizes(Dir& dir)
+        static DirectorySizeList getListOfDirectorySizes(const Dir& dir)
         {
-            int size = 0;
-            DirectorySizeList sizeList;
-            sizeList.push_back({dir.getName(), dir.getSize()});
-            for(auto sub = dir.subDirs().begin(); sub != dir.subDirs().end(); ++sub)
-            {
-                auto dsl = getListOfDirectorySizes(*sub);
-                sizeList.insert(sizeList.end(), dsl.begin(), dsl.end());
-            }
+            auto sizeList = std::accumulate(dir.subDirs().cbegin(), dir.subDirs().cend(), DirectorySizeList{{dir.getName(), dir.getSize()}},
+                                            [](DirectorySizeList&& dsl, const Dir& sub){
+                auto subDsl = getListOfDirectorySizes(sub);
+                dsl.insert(dsl.end(), subDsl.cbegin(), subDsl.cend());
+                return std::move(dsl);
+            });
             return std::move(sizeList);
         }
 
@@ -176,7 +172,8 @@ namespace Day7 {
                 list.push_back(line);
             }
             // Now we have a list of commands/responses
-            for (auto line = list.begin(); line != list.end(); line++)
+            auto line = list.begin();
+            while(++line != list.end())
             {
                 std::string cmd;
                 if (getCommand(*line, cmd))
@@ -192,7 +189,7 @@ namespace Day7 {
             return;
         }
 
-        bool getCommand(const std::string& line, std::string& cmd)
+        static bool getCommand(const std::string& line, std::string& cmd)
         {
             const auto promptSize = kPrompt.length();
             const auto possiblePrompt = line.substr(0, promptSize);
@@ -202,7 +199,7 @@ namespace Day7 {
             return isCmd;
         }
 
-        TerminalLineList getCmdResponse(TerminalLineList::iterator line, TerminalLineList::iterator end)
+        static TerminalLineList getCmdResponse(TerminalLineList::iterator line, TerminalLineList::iterator end)
         {
             TerminalLineList response;
             line++; // Move past the cmd
@@ -229,12 +226,12 @@ namespace Day7 {
 
         void parseLsCommand(TerminalLineList response)
         {
-            const std::string kDir = "dir";
+            const std::string kDir{"dir"};
             for (const auto& line: response)
             {
                 if (line.find(kDir) != std::string::npos)
-                {
-                    std::string name = line.substr(kDir.length() + 1);
+                {   // Is a dir
+                    auto name = line.substr(kDir.length() + 1);
                     _fileSystem.curdir()->mkDir(name);
                 }
                 else
@@ -247,12 +244,15 @@ namespace Day7 {
             }
         }
 
-        const std::string kPrompt = "$";
+        static const std::string kPrompt;
         FileSystem _fileSystem;
     };
+
+    const std::string DirectoryBrowser::kPrompt = "$";
+
     int getSizeOfDir(DirectoryBrowser::DirectorySizeList dsl, const std::string& name)
     {
-        auto found = std::find_if(dsl.begin(), dsl.end(), [name](DirectoryBrowser::DirectorySize& dir){
+        auto found = std::find_if(dsl.cbegin(), dsl.cend(), [name](const DirectoryBrowser::DirectorySize& dir){
             return dir.first == name;
         });
         if (found != dsl.end())
@@ -262,8 +262,8 @@ namespace Day7 {
 
     int getSizeOfDirectoriesAtMost(DirectoryBrowser::DirectorySizeList dsl, int maxSize)
     {
-        auto size = std::accumulate(dsl.begin(), dsl.end(), 0,
-                                    [maxSize](int acc, DirectoryBrowser::DirectorySize& dir) -> int {
+        auto size = std::accumulate(dsl.cbegin(), dsl.cend(), 0,
+                                    [maxSize](int acc, const DirectoryBrowser::DirectorySize& dir) -> int {
                                         if (dir.second <= maxSize)
                                             acc += dir.second;
                                         return acc;
@@ -280,7 +280,7 @@ namespace Day7 {
             return rsl.second < lsl.second;
         });
 
-        auto dir = std::find_if(dsl.begin(), dsl.end(), [extraSpaceNeeded](DirectoryBrowser::DirectorySize& dsl){
+        auto dir = std::find_if(dsl.cbegin(), dsl.cend(), [extraSpaceNeeded](const DirectoryBrowser::DirectorySize& dsl){
             return dsl.second > extraSpaceNeeded;
         });
 

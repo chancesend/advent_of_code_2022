@@ -49,6 +49,7 @@ C Z
 
         auto score = sg.getTotalScore();
         std::cout << "[ DAY 2 ] Total Score  = " << score << std::endl;
+        ASSERT_EQ(score, 10994);
     }
 
     TEST(Day2Answer2, TotalScoreForStrategyGuideNewParse) {
@@ -64,6 +65,7 @@ C Z
 
         auto score = sg.getTotalScore();
         std::cout << "[ DAY 2 ] Total Score  = " << score << std::endl;
+        ASSERT_EQ(score, 12526);
     }
 
 }

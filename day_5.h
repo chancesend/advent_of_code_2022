@@ -37,14 +37,14 @@ namespace Day5 {
 
         CrateStacks(std::string in) : _stacks(parseStringData(in)) {}
 
-        Stack getStack(int i) { return _stacks[i]; }
+        Stack getStack(int i) const { return _stacks[i]; }
 
-        std::string getTopOfStacks() {
-            std::string str;
-            for (auto &stack: _stacks) {
+        std::string getTopOfStacks() const {
+            auto tosStr = std::accumulate(_stacks.begin(), _stacks.end(), std::string(""), [](std::string&& str, const Stack& stack) {
                 str += stack.top();
-            }
-            return str;
+                return std::move(str);
+            });
+            return tosStr;
         }
 
         void doMove(Move move, Move::Type type) {
@@ -71,15 +71,12 @@ namespace Day5 {
         }
 
     private:
-        int getNumStacksFromLine(std::string in) {
+        static int getNumStacksFromLine(std::string in) {
             // First parse the stack numbers
             std::stringstream sstrStackNums(in);
             std::vector<int> stackNums;
-            while (1) {
-                int num;
-                sstrStackNums >> num;
-                if (!sstrStackNums)
-                    break;
+            int num;
+            while (sstrStackNums >> num) {
                 stackNums.push_back(num);
             }
 
@@ -89,17 +86,17 @@ namespace Day5 {
 
         using StringLines = std::deque<std::string>;
 
-        Stack getStackFromStringLines(StringLines in, int i) {
+        static Stack getStackFromStringLines(StringLines in, int i) {
             const int col = 1 + 4 * i;
-            Stack stack;
-            for (const auto line: in) {
+            Stack stack = std::accumulate(in.begin(), in.end(), Stack(), [col](Stack&& acc, const std::string& line){
                 if ((col < line.length()) && (line[col] != ' '))
-                    stack.push(line[col]);
-            }
+                    acc.push(line[col]);
+                return std::move(acc);
+            });
             return stack;
         }
 
-        List parseStringData(std::string inData) {
+        static List parseStringData(std::string inData) {
             // Go in reverse line order
             StringLines stringDeque;
             auto ss = std::stringstream{inData};
@@ -142,10 +139,10 @@ namespace Day5 {
 
         }
 
-        MoveList getMoveList() { return _moves; }
+        MoveList getMoveList() const { return _moves; }
 
     private:
-        MoveList parseStringData(std::string inData) {
+        static MoveList parseStringData(std::string inData) {
             auto ss = std::stringstream{inData};
             MoveList ml;
 
@@ -157,7 +154,7 @@ namespace Day5 {
             return ml;
         }
 
-        Move parseMoveLine(std::string in) {
+        static Move parseMoveLine(std::string in) {
             // example: move 17 from 8 to 7
             std::string moveDel = "move";
             std::string fromDel = "from";
@@ -171,7 +168,7 @@ namespace Day5 {
             int numToMove{stoi(numToMoveStr)};
             const auto fromStackStr = in.substr(fromLoc + fromDel.length(), inLen - toLoc - 1);
             int fromStack{stoi(fromStackStr) - 1};
-            const auto toStackStr = in.substr(toLoc + toDel.length(), inLen - toLoc + toDel.length());
+            const auto toStackStr = in.substr(toLoc + toDel.length());
             int toStack{stoi(toStackStr) - 1};
 
             return Move{numToMove, fromStack, toStack};
@@ -194,12 +191,12 @@ namespace Day5 {
             _stacks = doMoves(_stacks, _moves, type);
         };
 
-        std::string getTopOfStacks() {
+        std::string getTopOfStacks() const {
             return _stacks.getTopOfStacks();
         }
 
     private:
-        std::pair<CrateStacks, Moves> parseStringData(std::string inData) {
+        static std::pair<CrateStacks, Moves> parseStringData(std::string inData) {
             // Split the crate stacks from the move list
             std::string delimiter = "move";
             std::string strCrateStacks = inData.substr(0, inData.find(delimiter));

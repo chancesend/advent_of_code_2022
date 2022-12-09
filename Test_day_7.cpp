@@ -82,6 +82,7 @@ $ ls
         int size = getSizeOfDirectoriesAtMost(dirSizeList, 100000);
 
         std::cout << "[ DAY 7 ] Total size of directories < 100000  = " << size << std::endl;
+        ASSERT_EQ(size, 1501149);
     }
 
     TEST(Day7Answer2, SizeOfDirectoryToDeleteToRunUpdate) {
@@ -104,6 +105,7 @@ $ ls
         int size = getDirSizeToDeleteToReclaimSpace(dirSizeList, extraSpaceNeeded);
 
         std::cout << "[ DAY 7 ] Total size of directories < 100000  = " << size << std::endl;
+        ASSERT_EQ(size, 10096985);
     }
 
 }

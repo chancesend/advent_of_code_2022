@@ -25,26 +25,24 @@ namespace Day6 {
             _somMarker = calculateUniqueMarker(in, somLookback);
         }
 
-        int getSopMarkerPos () {return _sopMarker;}
-        int getSomMarkerPos () {return _somMarker;}
+        int getSopMarkerPos() const {return _sopMarker;}
+        int getSomMarkerPos() const {return _somMarker;}
 
     private:
-        int calculateUniqueMarker(std::string in, int lookback)
+        int calculateUniqueMarker(std::string in, int lookback) const
         {
-            auto subBegin = 0;
-            for (; subBegin + lookback != in.length(); subBegin++)
+            for (auto subBegin = 0; subBegin + lookback != in.length(); subBegin++)
             {
                 auto sub = in.substr(subBegin, lookback);
                 std::sort(sub.begin(), sub.end());
 
-                bool duplicateFound = false;
-                for (auto subIter = sub.begin(); subIter != sub.end() - 1; subIter++)
-                {
-                    if (*subIter == *(subIter+1))
-                    {
-                        duplicateFound = true;
-                    }
-                }
+                auto uniqueSet = std::accumulate(sub.begin(), sub.end(), std::string(""), [](std::string&& str, char chr){
+                    if (str.back() != chr)
+                        str += chr;
+                    return std::move(str);
+                });
+
+                bool duplicateFound = (uniqueSet.size() != sub.size());
                 if (!duplicateFound)
                 {
                     // All characters are different

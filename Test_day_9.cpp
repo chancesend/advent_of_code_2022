@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <filesystem>
-#include "day_8.h"
+#include "day_9.h"
 
-namespace Day8 {
+namespace Day9 {
 
     std::string testInput = R"(30373
 25512
@@ -15,29 +15,20 @@ namespace Day8 {
 33549
 35390)";
 
-    class TestDay8 : public ::testing::Test {
+    class TestDay9 : public ::testing::Test {
     public:
-        TestDay8() : tv(testInput) {}
+        TestDay9() : tv(testInput) {}
 
         TreeViewer tv;
     };
 
-    TEST_F(TestDay8, GetVisibleTrees) {
+    TEST_F(TestDay9, GetVisibleTrees) {
         ASSERT_EQ(tv.numVisibleTrees(), 21);
     }
 
-    TEST_F(TestDay8, GetScenicScore) {
-        ASSERT_EQ(tv.getScenicScore({1, 2}), 4);
-        ASSERT_EQ(tv.getScenicScore({3, 2}), 8);
-    }
-
-    TEST_F(TestDay8, GetHighestScenicScore) {
-        ASSERT_EQ(tv.getHighestScenicScore(), 8);
-    }
-
-    TEST(Day8Answer1, GetVisibleTrees) {
+    TEST(Day9Answer1, xxx) {
         const std::filesystem::path dir = INPUTS_DIR;
-        std::ifstream inFile{dir / "input_day_8.txt"};
+        std::ifstream inFile{dir / "input_day_9.txt"};
         ASSERT_TRUE(inFile);
         ASSERT_TRUE(inFile.is_open());
 
@@ -48,13 +39,12 @@ namespace Day8 {
         TreeViewer tv(str);
         int num = tv.numVisibleTrees();
 
-        std::cout << "[ DAY 8 ] Visible trees  = " << num << std::endl;
-        ASSERT_EQ(num, 1859);
+        std::cout << "[ DAY 9 ] xxx  = " << num << std::endl;
     }
 
-    TEST(Day8Answer2, GetHighestScenicScore) {
+    TEST(Day8Answer2, yyy) {
         const std::filesystem::path dir = INPUTS_DIR;
-        std::ifstream inFile{dir / "input_day_8.txt"};
+        std::ifstream inFile{dir / "input_day_9.txt"};
         ASSERT_TRUE(inFile);
         ASSERT_TRUE(inFile.is_open());
 
@@ -65,8 +55,7 @@ namespace Day8 {
         TreeViewer tv(str);
         int num = tv.getHighestScenicScore();
 
-        std::cout << "[ DAY 8 ] Highest scenic score  = " << num << std::endl;
-        ASSERT_EQ(num, 332640);
+        std::cout << "[ DAY 8 ] yyy  = " << num << std::endl;
     }
 
 

@@ -17,6 +17,7 @@ class ElfAssignment
 public:
     using SectionId = int;
     using SectionList = std::vector<SectionId>;
+
     ElfAssignment() = default;
     ElfAssignment(std::string in)
     {
@@ -33,7 +34,7 @@ public:
         }
     }
 
-    SectionList getSections() {return _sections;}
+    SectionList getSections() const {return _sections;}
 
 private:
     SectionList _sections;
@@ -43,19 +44,15 @@ class SectionAssignment
 {
 public:
     using List = std::vector<SectionAssignment>;
-    using ElfAssignmentList = std::pair<ElfAssignment, ElfAssignment>;
-    SectionAssignment(std::string in) {
-        std::string delimiter = ",";
-        _elf1 = ElfAssignment(in.substr(0, in.find(delimiter)));
-        in.erase(0, in.find(delimiter) + delimiter.length());
-        _elf2 = ElfAssignment(in);
-    }
+    using ElfAssignmentList = std::vector<ElfAssignment>;
 
-    bool isOverlapping()
+    SectionAssignment(std::string in) : _elves(parseStringData(in)) {}
+
+    bool isOverlapping() const
     {
         ElfAssignment::SectionList intersection;
-        auto sections1 = _elf1.getSections();
-        auto sections2 = _elf2.getSections();
+        const auto sections1 = _elves[0].getSections();
+        const auto sections2 = _elves[1].getSections();
         std::set_intersection(sections1.begin(), sections1.end(),
                               sections2.begin(), sections2.end(),
                               std::back_inserter(intersection));
@@ -63,11 +60,11 @@ public:
         return isOverlapping;
     }
 
-    bool isFullyContained()
+    bool isFullyContained() const
     {
         ElfAssignment::SectionList intersection;
-        auto sections1 = _elf1.getSections();
-        auto sections2 = _elf2.getSections();
+        auto sections1 = _elves[0].getSections();
+        auto sections2 = _elves[1].getSections();
         std::set_intersection(sections1.begin(), sections1.end(),
                               sections2.begin(), sections2.end(),
                               std::back_inserter(intersection));
@@ -76,8 +73,22 @@ public:
     }
 
 private:
-    ElfAssignment _elf1;
-    ElfAssignment _elf2;
+    static ElfAssignmentList parseStringData(std::string in) {
+        ElfAssignmentList eal;
+        std::string delimiter = ",";
+        while(in.size())
+        {
+            ElfAssignment ea(in.substr(0, in.find(delimiter)));
+            eal.push_back(ea);
+            auto delPos = in.find(delimiter);
+            if (delPos == std::string::npos)
+                break;
+            in.erase(0, delPos + delimiter.length());
+        }
+        return eal;
+    }
+
+    ElfAssignmentList _elves;
 };
 
 class SectionAssignments
@@ -88,7 +99,7 @@ public:
 
     }
 
-    int numPairsOverlapping()
+    int numPairsOverlapping() const
     {
         int num = std::accumulate(_assignments.begin(), _assignments.end(), 0,
                                   [](int acc, SectionAssignment ass){
@@ -98,7 +109,7 @@ public:
         return num;
     }
 
-    int numPairsFullyContained()
+    int numPairsFullyContained() const
     {
         int num = std::accumulate(_assignments.begin(), _assignments.end(), 0,
                               [](int acc, SectionAssignment ass){
@@ -109,7 +120,7 @@ public:
     }
 
 private:
-    SectionAssignment::List parseStringData(std::string inData)
+    static SectionAssignment::List parseStringData(std::string inData)
     {
         SectionAssignment::List list;
         auto ss = std::stringstream{inData};

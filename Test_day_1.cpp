@@ -66,6 +66,7 @@ namespace Day1 {
 
         auto maxElf = cc.getElfWithMaxCalories();
         std::cout << "[ DAY 1 ] Max Calories  = " << maxElf.getNumCalories() << std::endl;
+        ASSERT_EQ(maxElf.getNumCalories(), 71023);
     }
 
     TEST(Day1Answer, total_calories_top_3_elves) {
@@ -85,6 +86,7 @@ namespace Day1 {
             calories += orderedElves[i].getNumCalories();
         }
         std::cout << "[ DAY 1 ] Calories for top 3 elves  = " << calories << std::endl;
+        ASSERT_EQ(calories, 206289);
     }
 
 }

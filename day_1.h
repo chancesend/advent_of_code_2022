@@ -16,6 +16,8 @@ class Elf {
 public:
     using CalorieList = std::vector<Calories>;
 
+    Elf() : _data() {}
+
     Elf(CalorieList inData) : _data(inData)
     {
     }
@@ -32,9 +34,8 @@ private:
 
 class CalorieCounter {
     using ElfList = std::vector<Elf>;
-public:
-    using ElfNumber = int;
 
+public:
     CalorieCounter(std::string inData)
     {
         _elves = parseStringData(inData);
@@ -53,19 +54,10 @@ public:
 
     Elf getElfWithMaxCalories()
     {
-        ElfNumber maxElf = 0;
-        Calories maxCals = 0;
-        for(int i = 0; i < _elves.size(); ++i)
-        {
-            const auto elf = _elves[i];
-            const auto numCals = elf.getNumCalories();
-            if (numCals > maxCals)
-            {
-                maxElf = i;
-                maxCals = numCals;
-            }
-        }
-        return _elves[maxElf];
+        const auto maxElf = std::accumulate(_elves.begin(), _elves.end(), Elf(), [](Elf&& acc, const Elf& elf) {
+            return (elf.getNumCalories() > acc.getNumCalories()) ? elf : std::move(acc);
+        });
+        return maxElf;
     }
 
     ElfList orderElvesByCalories()
@@ -80,7 +72,7 @@ public:
     }
 
 private:
-    ElfList parseStringData(std::string inData)
+    static ElfList parseStringData(std::string inData)
     {
         ElfList result;
         auto ss = std::stringstream{inData};

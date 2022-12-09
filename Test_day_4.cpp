@@ -64,6 +64,7 @@ namespace Day4 {
         auto num = sa.numPairsFullyContained();
 
         std::cout << "[ DAY 4 ] Num pairs fully contained  = " << num << std::endl;
+        ASSERT_EQ(num, 441);
     }
 
     TEST(Day4Answer2, NumAssignmentPairsOverlapping) {
@@ -80,5 +81,6 @@ namespace Day4 {
         auto num = sa.numPairsOverlapping();
 
         std::cout << "[ DAY 4 ] Num pairs overlapping  = " << num << std::endl;
+        ASSERT_EQ(num, 861);
     }
 }

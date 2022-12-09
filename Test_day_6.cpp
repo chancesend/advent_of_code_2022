@@ -44,6 +44,7 @@ namespace Day6 {
         auto sop = ds.getSopMarkerPos();
 
         std::cout << "[ DAY 6 ] Start of packet marker pos  = " << sop << std::endl;
+        ASSERT_EQ(sop, 1833);
     }
 
     TEST(Day6Answer2, StartOfMessageMarkerPos) {
@@ -57,8 +58,9 @@ namespace Day6 {
         std::string str{buffer.str()};
         DataStream ds(str);
 
-        auto sop = ds.getSomMarkerPos();
+        auto som = ds.getSomMarkerPos();
 
-        std::cout << "[ DAY 6 ] Start of message marker pos  = " << sop << std::endl;
+        std::cout << "[ DAY 6 ] Start of message marker pos  = " << som << std::endl;
+        ASSERT_EQ(som, 3425);
     }
 }

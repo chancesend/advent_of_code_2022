@@ -10,6 +10,7 @@
 #include <sstream>
 #include <tuple>
 #include <map>
+#include <numeric>
 
 class Round
 {
@@ -100,31 +101,26 @@ private:
     }
 
     static Shape charToMove(char in) {
-        Shape shape;
-        if (in == 'A')
-            shape = Shape::Rock;
-        else if (in == 'B')
-            shape = Shape::Paper;
-        else if (in == 'C')
-            shape = Shape::Scissors;
-        else if (in == 'X')
-            shape = Shape::Rock;
-        else if (in == 'Y')
-            shape = Shape::Paper;
-        else if (in == 'Z')
-            shape = Shape::Scissors;
-        return shape;
+        const std::map<char, Shape> kMoveMap =
+            {
+                {'A', Shape::Rock},
+                {'B', Shape::Paper},
+                {'C', Shape::Scissors},
+                {'X', Shape::Rock},
+                {'Y', Shape::Paper},
+                {'Z', Shape::Scissors},
+            };
+        return kMoveMap.at(in);
     }
 
     static Outcome charToOutcome(char in) {
-        Outcome outcome;
-        if (in == 'X')
-            outcome = Outcome::Lose;
-        else if (in == 'Y')
-            outcome = Outcome::Draw;
-        else if (in == 'Z')
-            outcome = Outcome::Win;
-        return outcome;
+        const std::map<char, Outcome> kOutcomeMap =
+                {
+                        {'X', Outcome::Lose},
+                        {'Y', Outcome::Draw},
+                        {'Z', Outcome::Win},
+                };
+        return kOutcomeMap.at(in);
     }
 
     Shape _opp;
@@ -142,16 +138,14 @@ public:
 
     int getTotalScore() const
     {
-        int totalScore = 0;
-        for (const auto& round: _roundList)
-        {
-            totalScore += round.score();
-        }
+        auto totalScore = std::accumulate(_roundList.begin(), _roundList.end(), 0, [](int acc, const Round& round){
+            return acc + round.score();
+        });
         return totalScore;
     }
 
 private:
-    RoundList parseStringData(std::string inData, Round::Parser parser)
+    static RoundList parseStringData(std::string inData, Round::Parser parser)
     {
         RoundList result;
         auto ss = std::stringstream{inData};

@@ -48,7 +48,7 @@ public:
         std::tie(_firstHalf, _secondHalf) = parseStringData(in);
     }
 
-    Item itemInBothCompartments()
+    Item itemInBothCompartments() const
     {
         Item::List intersection;
         Item::List sortedFirst = lower();
@@ -61,20 +61,21 @@ public:
         return intersection[0];
     }
 
-    Item::List lower() {return _firstHalf;}
-    Item::List upper() {return _secondHalf;}
+    Item::List lower() const {return _firstHalf;}
+    Item::List upper() const {return _secondHalf;}
 
 private:
     static std::pair<Item::List, Item::List> parseStringData(std::string inData)
     {
-        const int compartmentSize = inData.length() / 2;
-        Item::List first;
-        Item::List second;
+        const int splitPoint = inData.length() / 2;
 
-        for (int i = 0; i < compartmentSize; ++i) {
-            first.push_back(Item(inData[i]));
-            second.push_back(Item(inData[compartmentSize + i]));
-        }
+        auto listBuilder = [](Item::List&& acc, char item) -> Item::List{
+            acc.push_back(Item(item));
+            return std::move(acc);
+        };
+
+        auto first = std::accumulate(inData.begin(), inData.begin() + splitPoint, Item::List(), listBuilder);
+        auto second = std::accumulate(inData.begin() + splitPoint, inData.end(), Item::List(), listBuilder);
 
         return {first, second};
     }
@@ -108,8 +109,8 @@ private:
     static Item::List parseStringData(std::string inData)
     {
         Item::List list;
-        for (int i = 0; i < inData.size(); ++i) {
-            list.push_back(Item(inData[i]));
+        for (auto item: inData) {
+            list.push_back(Item(item));
         }
 
         return list;
@@ -137,17 +138,16 @@ public:
     }
 
     Item getBadge() const {
-        Item::List intersection{_rucksacks[0].getItems()};
-        for (auto rs: _rucksacks)
-        {
+        auto intersectionBuilder = [](Item::List&& intersection, SortedRucksack rs){
             Item::List newIntersection;
-            auto items = rs.getItems();
             std::set_intersection(intersection.begin(), intersection.end(),
-                                  items.begin(), items.end(),
+                                  rs.getItems().begin(), rs.getItems().end(),
                                   std::back_inserter(newIntersection));
-            intersection = newIntersection;
-        }
-        return intersection[0];
+            return std::move(newIntersection);
+
+        };
+        auto badge = std::accumulate(_rucksacks.begin(), _rucksacks.end(), Item::List(_rucksacks[0].getItems()), intersectionBuilder);
+        return badge[0];
     }
 
 private:
@@ -173,7 +173,7 @@ public:
             if (i % groupSize == groupSize - 1)
             {
                 ElfGroup eg(tempRsl);
-                groups.push_back(eg);
+                groups.push_back(std::move(eg));
                 tempRsl.clear();
             }
         }
@@ -182,11 +182,10 @@ public:
 
     Item::List commonItems()
     {
-        Item::List itemList;
-        for(auto& rucksack: _rsl)
-        {
-            itemList.push_back(rucksack.itemInBothCompartments());
-        }
+        Item::List itemList = std::accumulate(_rsl.begin(), _rsl.end(), Item::List(), [](Item::List&& acc, const Rucksack& rs){
+            acc.push_back(rs.itemInBothCompartments());
+            return acc;
+        });
         return itemList;
     }
 

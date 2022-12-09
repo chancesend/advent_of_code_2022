@@ -83,6 +83,7 @@ CrZsJsPPZsGzwwsLwLmpwMDw)";
         auto sum = sumOfPriorities(itemList);
 
         std::cout << "[ DAY 3 ] Sum of priorities  = " << sum << std::endl;
+        ASSERT_EQ(sum, 7826);
     }
 
 
@@ -101,5 +102,6 @@ CrZsJsPPZsGzwwsLwLmpwMDw)";
         auto sum = sumOfGroupBadges(elfGroups);
 
         std::cout << "[ DAY 3 ] Sum of elf group badges = " << sum << std::endl;
+        ASSERT_EQ(sum, 2577);
     }
 }

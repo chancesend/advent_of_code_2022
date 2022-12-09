@@ -63,6 +63,7 @@ move 1 from 1 to 2
         auto top = cm.getTopOfStacks();
 
         std::cout << "[ DAY 5 ] Top of stacks CM9000  = " << top << std::endl;
+        ASSERT_EQ(top, "HBTMTBSDC");
     }
 
     TEST(Day5Answer2, TopOfStacksPostMove_CM9001) {
@@ -79,5 +80,6 @@ move 1 from 1 to 2
         auto top = cm.getTopOfStacks();
 
         std::cout << "[ DAY 5 ] Top of stacks CM9001  = " << top << std::endl;
+        ASSERT_EQ(top, "PQTJRSHWS");
     }
 }
