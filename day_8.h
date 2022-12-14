@@ -13,201 +13,159 @@
 #include <numeric>
 #include <stack>
 #include <iostream>
+#include <Eigen/Dense>
 
 namespace Day8 {
+    using TreeMap = Eigen::ArrayXXi;
+    using Vec = Eigen::Array<int, 1, Eigen::Dynamic>;
+    using Dims = std::pair<int, int>;
 
-    class TreeMap
+    Dims getDims(const TreeMap& map)
     {
-    public:
-        using Vec = std::vector<int>;
-        using Dims = std::pair<int, int>;
-        using Map = std::vector<Vec>;
-
-        TreeMap() : _map() {}
-        TreeMap(Dims dims) : _map(dims.first) {
-            std::for_each(_map.begin(), _map.end(), [col=dims.second](auto& row){row.resize(col);});
-        }
-
-        Vec row(int i) const
-        {
-            return _map[i];
-        }
-
-        void setRow(int i, Vec vec)
-        {
-            _map[i] = vec;
-        }
-
-        Vec col(int j) const
-        {
-            Vec col;
-            col.reserve(_map[0].size());
-            col = std::accumulate(_map.cbegin(), _map.cend(), col, [j](Vec&& acc, const Vec& vec){
-                acc.push_back(vec[j]);
-                return std::move(acc);
-            });
-            return col;
-        }
-
-        void setCol(int j, Vec vec)
-        {
-            for(int i = 0; i < _map[0].size(); ++i)
-            {
-                _map[i][j] = vec[i];
-            }
-        }
-
-        void push_back(Vec row)
-        {
-            _map.push_back(row);
-        }
-
-        Dims getDims() const {return {_map.size(), _map[0].size()};}
-
-        Map _map;
-    };
+        return {map.rows(), map.cols()};
+    }
 
     void updateVisibleMap(TreeMap& map, const TreeMap& dir)
     {
-        TreeMap::Dims dims = map.getDims();
-        for (int i = 0; i < dims.first; ++i)
+        TreeMap temp = map.binaryExpr(dir, [](int l, int r)
         {
-            auto mapRow = map.row(i);
-            auto dirRow = dir.row(i);
-            TreeMap::Vec totalVisible;
-            std::transform(mapRow.cbegin(), mapRow.cend(), dirRow.cbegin(), mapRow.begin(), [](int l, int r)
-            {
-                // Return true if tree is visible from any angle
-                return ((l > 0) || (r >= 0));
-            });
-            map.setRow(i, mapRow);
-        }
+            // Return true if tree is visible from any angle
+            return ((l > 0) || (r >= 0)) ? 1 : 0;
+        });
+        map = temp.eval();
     }
 
     int sumNumVisible(const TreeMap& map)
     {
-        int sum = 0;
-        for (int i = 0; i < map.getDims().first; ++i)
-        {
-            auto mapRow = map.row(i);
-            auto thisSum = std::accumulate(mapRow.cbegin(), mapRow.cend(), 0, [](int&& acc, int val) {
-                acc += val;
-                return std::move(acc);
-            });
-            sum += thisSum;
-        }
+        return map.sum();
+    }
 
-        return sum;
+    template<typename T, int R, int C>
+    static std::string toString(const Eigen::Array<T,R,C>& mat){
+        std::stringstream ss;
+        ss << mat;
+        return ss.str();
     }
 
     class TreeViewer
     {
     public:
 
-        TreeViewer(std::string in) :
+        explicit TreeViewer(const std::string& in) :
             _treemap(parseStringData(in)),
-            _treemapDims(_treemap.getDims())
+            _treemapDims({_treemap.rows(), _treemap.cols()})
         {
         }
 
-        int numVisibleTrees() const
-        {
-            // Look at trees from all 4 directions to calculate the visibleMatrix
-            TreeMap visibleMap(_treemapDims);
+        TreeMap treeMap() { return _treemap.eval();}
+        TreeMap visibleMap() { return _visibleMap.eval();}
 
-            auto maxFcn = [](int l, int r)
-            {
-                return std::max(l, r);
-            };
+        [[nodiscard]] int numVisibleTrees()
+        {
+            // Look at trees from all 4 directions to calculate the visible array
+            TreeMap visibleMap(_treemapDims.first, _treemapDims.second);
+            visibleMap.setZero();
+
             auto visibilityFcn = [](int l, int r)
             {
                 return l > r ? l : -1;
             };
 
+            auto visibleMapUpdateFcn = [](int l, int r)
+            {
+                // Return true if tree is visible from any angle
+                return ((l > 0) || (r >= 0)) ? 1 : 0;
+            };
+
             // Ugh, I'd really like to refactor this into reusable sections,
-            // probably by making the matrix rotatable, but
-            // I'd probably need to redo the original tree matrix data structure.
+            // probably by making the matrix rotatable
 
             // North
             {
-                TreeMap visibleThisDir(_treemapDims);
-                TreeMap::Vec max = _treemap.row(0);
-                visibleThisDir.setRow(0, max); // All trees on edge are visible
+                TreeMap visibleThisDir(_treemapDims.first, _treemapDims.second);
+                Vec max = _treemap.row(0);
+                visibleThisDir.row(0) = max; // All trees on edge are visible
                 for (int i = 1; i < _treemapDims.first; ++i)
                 {
-                    TreeMap::Vec vec = _treemap.row(i);
-                    TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
-                    visibleThisDir.setRow(i, visibleResult);
-
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
+                    Vec vec = _treemap.row(i);
+                    Vec temp = vec.binaryExpr(max, visibilityFcn);
+                    visibleThisDir.row(i) = temp;
+                    max = vec.cwiseMax(max);
                 }
-                updateVisibleMap(visibleMap, visibleThisDir);
+                visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
+                auto strVis = toString(visibleThisDir);
+                auto strMap = toString(visibleMap);
+                std::cout << std::endl << "N:" << std::endl << strVis << std::endl << strMap;
             }
             // South
             {
-                TreeMap visibleThisDir(_treemapDims);
-                TreeMap::Vec max = _treemap.row(_treemapDims.first - 1); // All trees on edge are visible
-                visibleThisDir.setRow(_treemapDims.first - 1, max);
+                TreeMap visibleThisDir(_treemapDims.first, _treemapDims.second);
+                Vec max = _treemap.row(_treemapDims.first - 1); // All trees on edge are visible
+                visibleThisDir.row(_treemapDims.first - 1) = max;
                 for (int i = _treemapDims.first - 2; i >= 0; --i)
                 {
-                    TreeMap::Vec vec = _treemap.row(i);
-                    TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
-                    visibleThisDir.setRow(i, visibleResult);
-
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
+                    Vec vec = _treemap.row(i);
+                    Vec temp = vec.binaryExpr(max, visibilityFcn);
+                    visibleThisDir.row(i) = temp;
+                    max = vec.cwiseMax(max);
                 }
-                updateVisibleMap(visibleMap, visibleThisDir);
+                visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
+                auto strVis = toString(visibleThisDir);
+                auto strMap = toString(visibleMap.eval());
+                std::cout << std::endl << "S:" << std::endl << strVis << std::endl << strMap;
             }
             // West
             {
-                TreeMap visibleThisDir(_treemapDims);
-                TreeMap::Vec max = _treemap.col(0); // All trees on edge are visible
-                visibleThisDir.setCol(0, max);
+                TreeMap visibleThisDir(_treemapDims.first, _treemapDims.second);
+                Vec max = _treemap.col(0);
+                visibleThisDir.col(0) = max; // All trees on edge are visible
                 for (int i = 1; i < _treemapDims.second; ++i)
                 {
-                    TreeMap::Vec vec = _treemap.col(i);
-                    TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
-                    visibleThisDir.setCol(i, visibleResult);
-
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
+                    Vec vec = _treemap.col(i);
+                    Vec temp = vec.binaryExpr(max, visibilityFcn);
+                    visibleThisDir.col(i) = temp;
+                    max = vec.cwiseMax(max);
                 }
-                updateVisibleMap(visibleMap, visibleThisDir);
+                visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
+                auto strVis = toString(visibleThisDir);
+                auto strMap = toString(visibleMap.eval());
+                std::cout << std::endl << "W:" << std::endl << strVis << std::endl << strMap;
             }
             // East
             {
-                TreeMap visibleThisDir(_treemapDims);
-                TreeMap::Vec max = _treemap.col(_treemapDims.second - 1); // All trees on edge are visible
-                visibleThisDir.setCol(_treemapDims.second - 1, max);
+                TreeMap visibleThisDir(_treemapDims.first, _treemapDims.second);
+                Vec max = _treemap.col(_treemapDims.second - 1); // All trees on edge are visible
+                visibleThisDir.col(_treemapDims.second - 1) = max;
                 for (int i = _treemapDims.second - 2; i >= 0; --i)
                 {
-                    TreeMap::Vec vec = _treemap.col(i);
-                    TreeMap::Vec visibleResult;
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), std::back_inserter(visibleResult), visibilityFcn);
-                    visibleThisDir.setCol(i, visibleResult);
-
-                    std::transform(vec.cbegin(), vec.cend(), max.cbegin(), max.begin(), maxFcn);
+                    Vec vec = _treemap.col(i);
+                    Vec temp = vec.binaryExpr(max, visibilityFcn);
+                    visibleThisDir.col(i) = temp;
+                    max = vec.cwiseMax(max);
                 }
-                updateVisibleMap(visibleMap, visibleThisDir);
+                visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
+                auto strVis = toString(visibleThisDir);
+                auto strMap = toString(visibleMap.eval());
+                std::cout << std::endl << "E:" << std::endl << strVis << std::endl << strMap;
             }
 
-            int numVisible = sumNumVisible(visibleMap);
+            int numVisible = sumNumVisible(visibleMap.eval());
+            auto visStr = toString(visibleMap);
+            _visibleMap = visibleMap;
             return numVisible;
         }
 
-        int getScenicScore(TreeMap::Dims coords)
+        int getScenicScore(Dims coords)
         {
             const auto [row, col] = coords;
-            auto targetHeight = _treemap.row(row)[col];
+            int targetHeight = _treemap(row, col);
             auto scenicScore = 1;
             // North
             {
                 int viewingDistance = 0;
                 for (int i = row - 1; i >= 0; --i) {
                     viewingDistance++;
-                    auto consideredTree = _treemap.row(i)[col];
+                    int consideredTree = _treemap(i, col);
                     if (consideredTree >= targetHeight)
                         break;
                 }
@@ -216,9 +174,9 @@ namespace Day8 {
             // South
             {
                 int viewingDistance = 0;
-                for (int i = row + 1; i < _treemap.getDims().first; ++i) {
+                for (int i = row + 1; i < _treemap.rows(); ++i) {
                     viewingDistance++;
-                    auto consideredTree = _treemap.row(i)[col];
+                    int consideredTree = _treemap(i, col);
                     if (consideredTree >= targetHeight)
                         break;
                 }
@@ -227,9 +185,9 @@ namespace Day8 {
             // East
             {
                 int viewingDistance = 0;
-                for (int i = col + 1; i < _treemap.getDims().second; ++i) {
+                for (int i = col + 1; i < _treemap.cols(); ++i) {
                     viewingDistance++;
-                    auto consideredTree = _treemap.row(row)[i];
+                    int consideredTree = _treemap(row, i);
                     if (consideredTree >= targetHeight)
                         break;
                 }
@@ -240,7 +198,7 @@ namespace Day8 {
                 int viewingDistance = 0;
                 for (int i = col -1; i >= 0; --i) {
                     viewingDistance++;
-                    auto consideredTree = _treemap.row(row)[i];
+                    int consideredTree = _treemap(row, i);
                     if (consideredTree >= targetHeight)
                         break;
                 }
@@ -251,8 +209,8 @@ namespace Day8 {
 
         int getHighestScenicScore()
         {
-            auto dims = _treemap.getDims();
             auto highestScore = 0;
+            auto dims = getDims(_treemap);
             for (int i = 0; i < dims.first; ++i)
             {
                 for (int j = 0; j < dims.second; ++j)
@@ -265,28 +223,51 @@ namespace Day8 {
         }
 
     private:
-        TreeMap parseStringData(std::string inData)
+        static TreeMap parseStringData(const std::string& inData)
         {
-            TreeMap map;
             auto ss = std::stringstream{inData};
 
+            auto [rows, cols] = getArrayDimsFromInput(inData);
+            TreeMap map(rows, cols);
+
+            int row = 0;
             for (std::string line; std::getline(ss, line, '\n');) {
-                TreeMap::Vec row;
+                auto cols = line.length();
+                Vec col(cols);
+                int thisCol = 0;
                 for(auto chr: line)
                 {
                     int height = stoi(std::string(1, chr));
-                    row.push_back(height);
+                    col(thisCol) = height;
+                    thisCol++;
                 }
-                map.push_back(row);
+
+                map.row(row) = col;
+                row++;
+                auto mapStr = toString(map);
             }
+            auto str = toString(map);
 
             return map;
         }
 
-        TreeMap _treemap;
-        TreeMap::Dims _treemapDims;
-    };
+        static std::pair<int, int> getArrayDimsFromInput(const std::string& inData) {
+            auto ss = std::stringstream{inData};
+            int rows = 0;
+            int cols = 0;
+            for (std::string line; std::getline(ss, line, '\n');) {
+                cols = line.length();
+                Vec col(cols);
+                rows++;
+            }
 
+            return {rows, cols};
+        }
+
+        TreeMap _treemap;
+        TreeMap _visibleMap;
+        Dims _treemapDims;
+    };
 }
 
 #endif //ADVENTOFCODE2022_DAY_8_H

@@ -159,9 +159,9 @@ namespace Day7 {
                                             [](DirectorySizeList&& dsl, const Dir& sub){
                 auto subDsl = getListOfDirectorySizes(sub);
                 dsl.insert(dsl.end(), subDsl.cbegin(), subDsl.cend());
-                return std::move(dsl);
+                return dsl;
             });
-            return std::move(sizeList);
+            return sizeList;
         }
 
         void parseStringData(const std::string& inData) {

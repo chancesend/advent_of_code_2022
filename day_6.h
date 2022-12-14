@@ -39,7 +39,7 @@ namespace Day6 {
                 auto uniqueSet = std::accumulate(sub.begin(), sub.end(), std::string(""), [](std::string&& str, char chr){
                     if (str.back() != chr)
                         str += chr;
-                    return std::move(str);
+                    return str;
                 });
 
                 bool duplicateFound = (uniqueSet.size() != sub.size());

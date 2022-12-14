@@ -67,7 +67,7 @@ U 20)";
         ASSERT_EQ(num, 6037);
     }
 
-    TEST(Day8Answer2, CountTailVisits_9Knots) {
+    TEST(Day9Answer2, CountTailVisits_10Knots) {
         const std::filesystem::path dir = INPUTS_DIR;
         std::ifstream inFile{dir / "input_day_9.txt"};
         ASSERT_TRUE(inFile);

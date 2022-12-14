@@ -186,7 +186,6 @@ namespace Day9 {
         int numPlacesTailVisited() const
         {
             // Refactor the board so that we can use some stdlib accumulation to do this
-
             int sum = 0;
             for (int i = 0; i < _board.dims().first; ++i)
             {

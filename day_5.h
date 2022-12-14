@@ -42,7 +42,7 @@ namespace Day5 {
         std::string getTopOfStacks() const {
             auto tosStr = std::accumulate(_stacks.begin(), _stacks.end(), std::string(""), [](std::string&& str, const Stack& stack) {
                 str += stack.top();
-                return std::move(str);
+                return str;
             });
             return tosStr;
         }
@@ -91,7 +91,7 @@ namespace Day5 {
             Stack stack = std::accumulate(in.begin(), in.end(), Stack(), [col](Stack&& acc, const std::string& line){
                 if ((col < line.length()) && (line[col] != ' '))
                     acc.push(line[col]);
-                return std::move(acc);
+                return acc;
             });
             return stack;
         }

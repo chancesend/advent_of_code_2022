@@ -23,7 +23,9 @@ namespace Day8 {
     };
 
     TEST_F(TestDay8, GetVisibleTrees) {
-        ASSERT_EQ(tv.numVisibleTrees(), 21);
+        auto visible = tv.numVisibleTrees();
+        std::cout << toString(tv.visibleMap());
+        ASSERT_EQ(visible, 21);
     }
 
     TEST_F(TestDay8, GetScenicScore) {

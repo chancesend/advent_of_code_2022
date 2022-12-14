@@ -71,7 +71,7 @@ private:
 
         auto listBuilder = [](Item::List&& acc, char item) -> Item::List{
             acc.push_back(Item(item));
-            return std::move(acc);
+            return acc;
         };
 
         auto first = std::accumulate(inData.begin(), inData.begin() + splitPoint, Item::List(), listBuilder);
@@ -143,7 +143,7 @@ public:
             std::set_intersection(intersection.begin(), intersection.end(),
                                   rs.getItems().begin(), rs.getItems().end(),
                                   std::back_inserter(newIntersection));
-            return std::move(newIntersection);
+            return newIntersection;
 
         };
         auto badge = std::accumulate(_rucksacks.begin(), _rucksacks.end(), Item::List(_rucksacks[0].getItems()), intersectionBuilder);
