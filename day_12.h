@@ -15,7 +15,7 @@
 #include <iostream>
 #include <cassert>
 #include <deque>
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 #include <map>
 
 namespace Day12 {
