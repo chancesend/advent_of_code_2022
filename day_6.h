@@ -18,7 +18,7 @@ namespace Day6 {
 
     class DataStream {
     public:
-        DataStream(std::string in) : _stream(in) {
+        DataStream(const std::string& in) : _stream(in) {
             constexpr int sopLookback = 4;
             constexpr int somLookback = 14;
             _sopMarker = calculateUniqueMarker(in, sopLookback);
@@ -29,7 +29,7 @@ namespace Day6 {
         int getSomMarkerPos() const {return _somMarker;}
 
     private:
-        int calculateUniqueMarker(std::string in, int lookback) const
+        int calculateUniqueMarker(const std::string& in, int lookback) const
         {
             for (auto subBegin = 0; subBegin + lookback != in.length(); subBegin++)
             {

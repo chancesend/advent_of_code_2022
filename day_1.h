@@ -36,7 +36,7 @@ class CalorieCounter {
     using ElfList = std::vector<Elf>;
 
 public:
-    CalorieCounter(std::string inData)
+    CalorieCounter(const std::string& inData)
     {
         _elves = parseStringData(inData);
     }
@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    static ElfList parseStringData(std::string inData)
+    static ElfList parseStringData(const std::string& inData)
     {
         ElfList result;
         auto ss = std::stringstream{inData};

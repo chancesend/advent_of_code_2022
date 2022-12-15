@@ -46,7 +46,7 @@ public:
     using List = std::vector<SectionAssignment>;
     using ElfAssignmentList = std::vector<ElfAssignment>;
 
-    SectionAssignment(std::string in) : _elves(parseStringData(in)) {}
+    SectionAssignment(const std::string& in) : _elves(parseStringData(in)) {}
 
     bool isOverlapping() const
     {
@@ -94,7 +94,7 @@ private:
 class SectionAssignments
 {
 public:
-    SectionAssignments(std::string in) : _assignments(parseStringData(in))
+    SectionAssignments(const std::string& in) : _assignments(parseStringData(in))
     {
 
     }
@@ -120,7 +120,7 @@ public:
     }
 
 private:
-    static SectionAssignment::List parseStringData(std::string inData)
+    static SectionAssignment::List parseStringData(const std::string& inData)
     {
         SectionAssignment::List list;
         auto ss = std::stringstream{inData};

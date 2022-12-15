@@ -44,7 +44,7 @@ class Rucksack {
 public:
     using List = std::vector<Rucksack>;
 
-    Rucksack(std::string in) {
+    Rucksack(const std::string& in) {
         std::tie(_firstHalf, _secondHalf) = parseStringData(in);
     }
 
@@ -65,7 +65,7 @@ public:
     Item::List upper() const {return _secondHalf;}
 
 private:
-    static std::pair<Item::List, Item::List> parseStringData(std::string inData)
+    static std::pair<Item::List, Item::List> parseStringData(const std::string& inData)
     {
         const int splitPoint = inData.length() / 2;
 
@@ -106,7 +106,7 @@ public:
     }
 
 private:
-    static Item::List parseStringData(std::string inData)
+    static Item::List parseStringData(const std::string& inData)
     {
         Item::List list;
         for (auto item: inData) {
@@ -158,7 +158,7 @@ class Rucksacks
 {
 public:
     using ElfGroups = std::vector<ElfGroup>;
-    Rucksacks(std::string in) {
+    Rucksacks(const std::string& in) {
         _rsl = parseStringData(in);
     }
 
@@ -190,7 +190,7 @@ public:
     }
 
 private:
-    Rucksack::List parseStringData(std::string inData)
+    Rucksack::List parseStringData(const std::string& inData)
     {
         Rucksack::List result;
         auto ss = std::stringstream{inData};

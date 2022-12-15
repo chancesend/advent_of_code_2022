@@ -35,7 +35,7 @@ namespace Day5 {
 
         CrateStacks() = default;
 
-        CrateStacks(std::string in) : _stacks(parseStringData(in)) {}
+        CrateStacks(const std::string& in) : _stacks(parseStringData(in)) {}
 
         Stack getStack(int i) const { return _stacks[i]; }
 
@@ -71,7 +71,7 @@ namespace Day5 {
         }
 
     private:
-        static int getNumStacksFromLine(std::string in) {
+        static int getNumStacksFromLine(const std::string& in) {
             // First parse the stack numbers
             std::stringstream sstrStackNums(in);
             std::vector<int> stackNums;
@@ -96,7 +96,7 @@ namespace Day5 {
             return stack;
         }
 
-        static List parseStringData(std::string inData) {
+        static List parseStringData(const std::string& inData) {
             // Go in reverse line order
             StringLines stringDeque;
             auto ss = std::stringstream{inData};
@@ -135,14 +135,14 @@ namespace Day5 {
 
         Moves() = default;
 
-        Moves(std::string in) : _moves(parseStringData(in)) {
+        Moves(const std::string& in) : _moves(parseStringData(in)) {
 
         }
 
         MoveList getMoveList() const { return _moves; }
 
     private:
-        static MoveList parseStringData(std::string inData) {
+        static MoveList parseStringData(const std::string& inData) {
             auto ss = std::stringstream{inData};
             MoveList ml;
 
@@ -186,7 +186,7 @@ namespace Day5 {
 
     class CrateMover {
     public:
-        CrateMover(std::string in, Move::Type type) : _stacks(), _moves() {
+        CrateMover(const std::string& in, Move::Type type) : _stacks(), _moves() {
             std::tie(_stacks, _moves) = parseStringData(in);
             _stacks = doMoves(_stacks, _moves, type);
         };

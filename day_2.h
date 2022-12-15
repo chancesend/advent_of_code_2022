@@ -27,7 +27,7 @@ public:
     };
 
     Round(Shape opp, Shape yours) : _opp(opp), _yours(yours) {}
-    Round(std::string round, Parser parser)
+    Round(const std::string& round, Parser parser)
     {
         _opp = charToMove(round.c_str()[0]);
 
@@ -131,7 +131,7 @@ class StrategyGuide {
 public:
     using RoundList = std::vector<Round>;
 
-    StrategyGuide(std::string in, Round::Parser parser)
+    StrategyGuide(const std::string& in, Round::Parser parser)
     {
         _roundList = parseStringData(in, parser);
     }
@@ -145,7 +145,7 @@ public:
     }
 
 private:
-    static RoundList parseStringData(std::string inData, Round::Parser parser)
+    static RoundList parseStringData(const std::string& inData, Round::Parser parser)
     {
         RoundList result;
         auto ss = std::stringstream{inData};

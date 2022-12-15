@@ -59,7 +59,7 @@ namespace Day10 {
 
     class StrengthChecker {
     public:
-        StrengthChecker(std::string in) : _program(parseStringData(in)) {}
+        StrengthChecker(const std::string& in) : _program(parseStringData(in)) {}
 
         std::vector<int> getAddList() {
             std::vector<int> addList;
@@ -91,7 +91,7 @@ namespace Day10 {
     private:
         using Program = std::vector<Command>;
 
-        static Program parseStringData(std::string in) {
+        static Program parseStringData(const std::string& in) {
             Program program;
             auto ss = std::stringstream{in};
 

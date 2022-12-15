@@ -7,16 +7,13 @@ add_subdirectory(cmake)
 enable_testing()
 
 add_library(current_day
-        day_12.h
+        day_14.h
         )
 set_target_properties(current_day PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(
-        current_tests
-        Test_Day_12.cpp
-)
-
 add_library(previous_days
+        day_13.h
+        day_12.h
         day_11.h
         day_10.h
         day_9.h
@@ -31,7 +28,14 @@ add_library(previous_days
 set_target_properties(previous_days PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(
+        current_tests
+        Test_Day_14.cpp
+)
+
+add_executable(
         previous_tests
+        Test_Day_13.cpp
+        Test_Day_12.cpp
         Test_Day_11.cpp
         Test_Day_10.cpp
         Test_Day_9.cpp

@@ -25,7 +25,7 @@ namespace Day9 {
         using List = std::vector<Move>;
         using Dir = char;
 
-        Move(std::string in) {
+        Move(const std::string& in) {
             std::tie(_relDir, _steps) = parseStringData(in);
         }
         Move(Dir dir, int steps) : _relDir(dirToRelDir(dir)), _steps(steps) {}
@@ -55,7 +55,7 @@ namespace Day9 {
             return relDir;
         }
 
-        static std::pair<Pos, int> parseStringData(std::string in)
+        static std::pair<Pos, int> parseStringData(const std::string& in)
         {
             auto relPos = dirToRelDir(in.substr(0, 1)[0]);
             int steps = std::stoi(in.substr(2));
@@ -170,7 +170,7 @@ namespace Day9 {
 
     class RopeMover {
     public:
-        RopeMover(std::string in, int numKnots, Board::Dims initialSize = {1, 1}) :
+        RopeMover(const std::string& in, int numKnots, Board::Dims initialSize = {1, 1}) :
             _movesList(parseStringData(in)),
             _board(initialSize),
             _knots(numKnots)
@@ -223,7 +223,7 @@ namespace Day9 {
             }
         }
 
-        static Move::List parseStringData(std::string in)
+        static Move::List parseStringData(const std::string& in)
         {
             Move::List ml;
             auto ss = std::stringstream{in};
