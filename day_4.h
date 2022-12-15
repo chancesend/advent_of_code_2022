@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_4_H
-#define ADVENTOFCODE2022_DAY_4_H
+#ifndef ADVENT_OF_CODE_2022_DAY_4_H
+#define ADVENT_OF_CODE_2022_DAY_4_H
 
 #include <vector>
 #include <string>
@@ -19,7 +19,7 @@ public:
     using SectionList = std::vector<SectionId>;
 
     ElfAssignment() = default;
-    ElfAssignment(std::string in)
+    explicit ElfAssignment(std::string in)
     {
         std::string delimiter = "-";
         auto strId1 = in.substr(0, in.find(delimiter));
@@ -34,7 +34,7 @@ public:
         }
     }
 
-    SectionList getSections() const {return _sections;}
+    [[nodiscard]] SectionList getSections() const {return _sections;}
 
 private:
     SectionList _sections;
@@ -46,9 +46,9 @@ public:
     using List = std::vector<SectionAssignment>;
     using ElfAssignmentList = std::vector<ElfAssignment>;
 
-    SectionAssignment(const std::string& in) : _elves(parseStringData(in)) {}
+    explicit SectionAssignment(const std::string& in) : _elves(parseStringData(in)) {}
 
-    bool isOverlapping() const
+    [[nodiscard]] bool isOverlapping() const
     {
         ElfAssignment::SectionList intersection;
         const auto sections1 = _elves[0].getSections();
@@ -56,11 +56,11 @@ public:
         std::set_intersection(sections1.begin(), sections1.end(),
                               sections2.begin(), sections2.end(),
                               std::back_inserter(intersection));
-        auto isOverlapping = (intersection.size() > 0);
+        auto isOverlapping = (!intersection.empty());
         return isOverlapping;
     }
 
-    bool isFullyContained() const
+    [[nodiscard]] bool isFullyContained() const
     {
         ElfAssignment::SectionList intersection;
         auto sections1 = _elves[0].getSections();
@@ -76,7 +76,7 @@ private:
     static ElfAssignmentList parseStringData(std::string in) {
         ElfAssignmentList eal;
         std::string delimiter = ",";
-        while(in.size())
+        while(!in.empty())
         {
             ElfAssignment ea(in.substr(0, in.find(delimiter)));
             eal.push_back(ea);
@@ -94,25 +94,25 @@ private:
 class SectionAssignments
 {
 public:
-    SectionAssignments(const std::string& in) : _assignments(parseStringData(in))
+    explicit SectionAssignments(const std::string& in) : _assignments(parseStringData(in))
     {
 
     }
 
-    int numPairsOverlapping() const
+    [[nodiscard]] int numPairsOverlapping() const
     {
         int num = std::accumulate(_assignments.begin(), _assignments.end(), 0,
-                                  [](int acc, SectionAssignment ass){
+                                  [](int acc, const SectionAssignment& ass){
                                       acc += ass.isOverlapping() ? 1 : 0;
                                       return acc;
                                   });
         return num;
     }
 
-    int numPairsFullyContained() const
+    [[nodiscard]] int numPairsFullyContained() const
     {
         int num = std::accumulate(_assignments.begin(), _assignments.end(), 0,
-                              [](int acc, SectionAssignment ass){
+                              [](int acc, const SectionAssignment& ass){
             acc += ass.isFullyContained() ? 1 : 0;
             return acc;
         });
@@ -136,4 +136,4 @@ private:
     SectionAssignment::List _assignments;
 };
 
-#endif //ADVENTOFCODE2022_DAY_3_H
+#endif //ADVENT_OF_CODE_2022_DAY_4_H

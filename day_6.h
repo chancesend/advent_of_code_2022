@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_6_H
-#define ADVENTOFCODE2022_DAY_6_H
+#ifndef ADVENT_OF_CODE_2022_DAY_6_H
+#define ADVENT_OF_CODE_2022_DAY_6_H
 
 #include <vector>
 #include <string>
@@ -18,18 +18,18 @@ namespace Day6 {
 
     class DataStream {
     public:
-        DataStream(const std::string& in) : _stream(in) {
+        explicit DataStream(const std::string& in) : _stream(in) {
             constexpr int sopLookback = 4;
             constexpr int somLookback = 14;
             _sopMarker = calculateUniqueMarker(in, sopLookback);
             _somMarker = calculateUniqueMarker(in, somLookback);
         }
 
-        int getSopMarkerPos() const {return _sopMarker;}
-        int getSomMarkerPos() const {return _somMarker;}
+        [[nodiscard]] int getSopMarkerPos() const {return _sopMarker;}
+        [[nodiscard]] int getSomMarkerPos() const {return _somMarker;}
 
     private:
-        int calculateUniqueMarker(const std::string& in, int lookback) const
+        [[nodiscard]] static int calculateUniqueMarker(const std::string& in, int lookback)
         {
             for (auto subBegin = 0; subBegin + lookback != in.length(); subBegin++)
             {
@@ -60,4 +60,4 @@ namespace Day6 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_6_H
+#endif //ADVENT_OF_CODE_2022_DAY_6_H

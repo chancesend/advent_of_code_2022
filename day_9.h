@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_9_H
-#define ADVENTOFCODE2022_DAY_9_H
+#ifndef ADVENT_OF_CODE_2022_DAY_9_H
+#define ADVENT_OF_CODE_2022_DAY_9_H
 
 #include <vector>
 #include <string>
@@ -25,13 +25,13 @@ namespace Day9 {
         using List = std::vector<Move>;
         using Dir = char;
 
-        Move(const std::string& in) {
+        explicit Move(const std::string& in) : _steps(0) {
             std::tie(_relDir, _steps) = parseStringData(in);
         }
         Move(Dir dir, int steps) : _relDir(dirToRelDir(dir)), _steps(steps) {}
 
         Pos relDir() {return _relDir;}
-        int steps() {return _steps;}
+        [[nodiscard]] int steps() const {return _steps;}
 
     private:
         static Pos dirToRelDir(char dir)
@@ -51,6 +51,8 @@ namespace Day9 {
                 case 'R':
                     relDir = {1, 0};
                     break;
+                default:
+                    assert(!"Unknown dir");
             }
             return relDir;
         }
@@ -75,7 +77,7 @@ namespace Day9 {
 
         Board() : Board(Dims(0,0)) {}
 
-        Board(Dims dims)
+        explicit Board(Dims dims)
         {
             resize(dims);
             _startingPos = Pos((dims.first-1)/2, (dims.second-1)/2);
@@ -87,12 +89,12 @@ namespace Day9 {
             return _startingPos;
         }
 
-        Dims dims() const
+        [[nodiscard]] Dims dims() const
         {
             Dims dims{_board.size(), _board[0].size()};
             return dims;
         }
-        int posVal(Pos pos) const
+        [[nodiscard]] int posVal(Pos pos) const
         {
             return _board[pos.first][pos.second];
         }
@@ -183,7 +185,7 @@ namespace Day9 {
             doMoves(_movesList);
         }
 
-        int numPlacesTailVisited() const
+        [[nodiscard]] int numPlacesTailVisited() const
         {
             // Refactor the board so that we can use some stdlib accumulation to do this
             int sum = 0;
@@ -202,7 +204,7 @@ namespace Day9 {
 
         void doRopeMove(Move move)
         {
-            for (int i = 0; i < move.steps(); ++i)
+            for (int moves = 0; moves < move.steps(); ++moves)
             {
                 _knots[0] = _board.doHeadMove(_knots[0], move.relDir());
                 for (int i = 1; i < _knots.size() - 1; ++i)
@@ -245,4 +247,4 @@ namespace Day9 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_9_H
+#endif //ADVENT_OF_CODE_2022_DAY_9_H

@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_12_H
-#define ADVENTOFCODE2022_DAY_12_H
+#ifndef ADVENT_OF_CODE_2022_DAY_12_H
+#define ADVENT_OF_CODE_2022_DAY_12_H
 
 #include <vector>
 #include <string>
@@ -78,7 +78,7 @@ namespace Day12 {
             PosStepsVector visited;
             queue.push_back({_start, 0});
             int minSteps = 0;
-            auto found = doPathStep(queue, visited, minSteps);
+            doPathStep(queue, visited, minSteps);
             return minSteps;
         }
 
@@ -86,8 +86,6 @@ namespace Day12 {
         {
             while(!queue.empty())
             {
-                const auto numVisited = visited.size();
-                const auto queueSize = queue.size();
                 const auto posAndStepNum = queue.front();
                 const auto pos = posAndStepNum.first;
                 const auto stepNum = posAndStepNum.second;
@@ -205,4 +203,4 @@ namespace Day12 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_12_H
+#endif //ADVENT_OF_CODE_2022_DAY_12_H

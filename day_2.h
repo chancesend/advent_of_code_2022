@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_2_H
-#define ADVENTOFCODE2022_DAY_2_H
+#ifndef ADVENT_OF_CODE_2022_DAY_2_H
+#define ADVENT_OF_CODE_2022_DAY_2_H
 
 #include <string>
 #include <vector>
@@ -41,7 +41,7 @@ public:
         }
     }
 
-    int score() const
+    [[nodiscard]] int score() const
     {
         return shapeScore() + outcomeScore();
     }
@@ -54,7 +54,7 @@ private:
         Win = 6
     };
 
-    Shape getMoveForOutcome(Shape opp, Outcome outcome) const
+    [[nodiscard]] Shape getMoveForOutcome(Shape opp, Outcome outcome) const
     {
         const auto round = std::find_if(outcomeList.cbegin(), outcomeList.cend(),
                                         [opp, outcome](RoundState state){
@@ -63,14 +63,12 @@ private:
         return round->yours;
     }
 
-    int shapeScore() const
+    [[nodiscard]] int shapeScore() const
     {
         return static_cast<int>(_yours);
     }
 
     // Order is Opponent, Yours, Outcome
-    using OutcomeEntry = std::tuple<Shape, Shape, Outcome>;
-    using Moves = std::pair<Shape, Shape>;
     struct RoundState
     {
         Shape opp;
@@ -91,7 +89,7 @@ private:
             {Shape::Scissors, Shape::Scissors, Outcome::Draw},
     };
 
-    int outcomeScore() const
+    [[nodiscard]] int outcomeScore() const
     {
         const auto round = std::find_if(outcomeList.cbegin(), outcomeList.cend(),
                                           [opp=_opp, yours=_yours](RoundState state){
@@ -136,7 +134,7 @@ public:
         _roundList = parseStringData(in, parser);
     }
 
-    int getTotalScore() const
+    [[nodiscard]] int getTotalScore() const
     {
         auto totalScore = std::accumulate(_roundList.begin(), _roundList.end(), 0, [](int acc, const Round& round){
             return acc + round.score();
@@ -161,4 +159,4 @@ private:
     RoundList _roundList;
 };
 
-#endif //ADVENTOFCODE2022_DAY_2_H
+#endif //ADVENT_OF_CODE_2022_DAY_2_H

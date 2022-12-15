@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_10_H
-#define ADVENTOFCODE2022_DAY_10_H
+#ifndef ADVENT_OF_CODE_2022_DAY_10_H
+#define ADVENT_OF_CODE_2022_DAY_10_H
 
 #include <vector>
 #include <string>
@@ -19,7 +19,7 @@ namespace Day10 {
 
     class Command {
     public:
-        Command(const std::string& in) {
+        explicit Command(const std::string& in) {
             auto cmdString = in.substr(0, kADDX.length());
             if (in.length() > kADDX.length()) {
                 auto paramString = in.substr(kADDX.length() + 1);
@@ -27,10 +27,8 @@ namespace Day10 {
             }
             if (cmdString == kADDX) {
                 _cmd = Cmd::ADDX;
-                _cycles = 2;
             } else if (cmdString == kNOOP) {
                 _cmd = Cmd::NOOP;
-                _cycles = 1;
             }
         }
 
@@ -54,12 +52,11 @@ namespace Day10 {
 
         Cmd _cmd;
         int _param;
-        int _cycles;
     };
 
     class StrengthChecker {
     public:
-        StrengthChecker(const std::string& in) : _program(parseStringData(in)) {}
+        explicit StrengthChecker(const std::string& in) : _program(parseStringData(in)) {}
 
         std::vector<int> getAddList() {
             std::vector<int> addList;
@@ -70,7 +67,7 @@ namespace Day10 {
             return addList;
         }
 
-        std::vector<int> getXAccumList(std::vector<int> addList) {
+        [[nodiscard]] std::vector<int> getXAccumList(std::vector<int> addList) const {
             std::vector<int> xAddrList(addList.size());
             addList[0] += _xRegStart;
             std::partial_sum(addList.begin(), addList.end(), xAddrList.begin());
@@ -134,4 +131,4 @@ namespace Day10 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_10_H
+#endif //ADVENT_OF_CODE_2022_DAY_10_H

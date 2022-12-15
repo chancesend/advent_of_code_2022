@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/14/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_14_H
-#define ADVENTOFCODE2022_DAY_14_H
+#ifndef ADVENT_OF_CODE_2022_DAY_14_H
+#define ADVENT_OF_CODE_2022_DAY_14_H
 
 #include <vector>
 #include <string>
@@ -73,17 +73,12 @@ public:
         _grid.rightCols(2) = Air;
         _grid.rightCols(1) = Rock;
 
-        std::cout << "Start grid: " << std::endl;
-        std::cout << _grid.transpose();
 
         int num = 0;
         while(doSandFall(start))
         {
             num++;
         }
-        int count = (_grid == Sand).any();
-        std::cout << "Final grid: " << std::endl;
-        std::cout << _grid.transpose();
         return num;
     }
 
@@ -94,9 +89,6 @@ public:
         {
             num++;
         }
-        int count = (_grid == Sand).any();
-        std::cout << "Final grid: " << std::endl;
-        std::cout << _grid.transpose();
         return num;
     }
 
@@ -122,10 +114,6 @@ public:
             assert(y+1 >= 0);
             assert(y+1 < _grid.cols());
 
-            auto elem = _grid(x, y);
-            auto down = _grid(x, y+1);
-            auto downl = _grid(x-1, y+1);
-            auto downr = _grid(x+1, y+1);
             if (_grid(x, y+1) == Air)
             {
                 y++;
@@ -237,4 +225,4 @@ private:
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_14_H
+#endif // ADVENT_OF_CODE_2022_DAY_14_H

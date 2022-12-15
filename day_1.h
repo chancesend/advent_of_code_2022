@@ -18,11 +18,11 @@ public:
 
     Elf() : _data() {}
 
-    Elf(CalorieList inData) : _data(inData)
+    explicit Elf(CalorieList inData) : _data(inData)
     {
     }
 
-    int getNumCalories() const
+    [[nodiscard]] int getNumCalories() const
     {
         auto sum = std::accumulate(_data.begin(), _data.end(), 0);
         return sum;
@@ -36,14 +36,14 @@ class CalorieCounter {
     using ElfList = std::vector<Elf>;
 
 public:
-    CalorieCounter(const std::string& inData)
+    explicit CalorieCounter(const std::string& inData)
     {
         _elves = parseStringData(inData);
     }
 
     int getNumElves()
     {
-        return _elves.size();
+        return static_cast<int>(_elves.size());
     }
 
     int getNumCaloriesForElf(int elfNum)
@@ -54,8 +54,8 @@ public:
 
     Elf getElfWithMaxCalories()
     {
-        const auto maxElf = std::accumulate(_elves.begin(), _elves.end(), Elf(), [](Elf&& acc, const Elf& elf) {
-            return (elf.getNumCalories() > acc.getNumCalories()) ? elf : std::move(acc);
+        auto maxElf = std::accumulate(_elves.begin(), _elves.end(), Elf(), [](Elf&& acc, const Elf& elf) {
+            return (elf.getNumCalories() > acc.getNumCalories()) ? elf : acc;
         });
         return maxElf;
     }
@@ -77,22 +77,22 @@ private:
         ElfList result;
         auto ss = std::stringstream{inData};
 
-        Elf::CalorieList thisElf;
+        Elf::CalorieList cl;
         for (std::string line; std::getline(ss, line, '\n');) {
-            if (line == "")
+            if (line.empty())
             {
-                result.push_back(thisElf);
-                thisElf.clear();
+                result.push_back(Elf(cl));
+                cl.clear();
             }
             else
             {
                 auto val = stoi(line);
-                thisElf.push_back(val);
+                cl.push_back(val);
             }
         }
-        if (thisElf.size() > 0)
+        if (!cl.empty())
         {
-            result.push_back(thisElf);
+            result.push_back(Elf(cl));
         }
 
         return result;

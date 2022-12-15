@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_3_H
-#define ADVENTOFCODE2022_DAY_3_H
+#ifndef ADVENT_OF_CODE_2022_DAY_3_H
+#define ADVENT_OF_CODE_2022_DAY_3_H
 
 #include <vector>
 #include <string>
@@ -16,11 +16,11 @@ class Item {
 public:
     using List = std::vector<Item>;
 
-    Item(char in) : _item(in) {}
+    explicit Item(char in) : _item(in) {}
 
-    int priority() const {
+    [[nodiscard]] int priority() const {
         int priority;
-        char shift;
+        char shift = 0;
         if ((_item >= 'a') && (_item <= 'z'))
             shift = 'a' - 1;
         else if ((_item >= 'A') && (_item <= 'Z'))
@@ -29,9 +29,9 @@ public:
         return priority;
     }
 
-    char get() {return _item;}
+    [[nodiscard]] char get() const {return _item;}
 
-    bool operator< (Item rhl)
+    bool operator< (Item rhl) const
     {
         return priority() < rhl.priority();
     }
@@ -44,11 +44,11 @@ class Rucksack {
 public:
     using List = std::vector<Rucksack>;
 
-    Rucksack(const std::string& in) {
+    explicit Rucksack(const std::string& in) {
         std::tie(_firstHalf, _secondHalf) = parseStringData(in);
     }
 
-    Item itemInBothCompartments() const
+    [[nodiscard]] Item itemInBothCompartments() const
     {
         Item::List intersection;
         Item::List sortedFirst = lower();
@@ -61,13 +61,13 @@ public:
         return intersection[0];
     }
 
-    Item::List lower() const {return _firstHalf;}
-    Item::List upper() const {return _secondHalf;}
+    [[nodiscard]] Item::List lower() const {return _firstHalf;}
+    [[nodiscard]] Item::List upper() const {return _secondHalf;}
 
 private:
     static std::pair<Item::List, Item::List> parseStringData(const std::string& inData)
     {
-        const int splitPoint = inData.length() / 2;
+        const int splitPoint = static_cast<int>(inData.length()) / 2;
 
         auto listBuilder = [](Item::List&& acc, char item) -> Item::List{
             acc.push_back(Item(item));
@@ -88,7 +88,7 @@ class SortedRucksack : public Rucksack {
 public:
     using List = std::vector<SortedRucksack>;
 
-    SortedRucksack(Rucksack rs) : Rucksack(rs) {
+    explicit SortedRucksack(const Rucksack& rs) : Rucksack(rs) {
         Item::List rsUnion;
         Item::List sortedFirst = lower();
         Item::List sortedSecond = upper();
@@ -100,22 +100,12 @@ public:
         std::sort(_items.begin(), _items.end());
     }
 
-    Item::List getItems() const
+    [[nodiscard]] Item::List getItems() const
     {
         return _items;
     }
 
 private:
-    static Item::List parseStringData(const std::string& inData)
-    {
-        Item::List list;
-        for (auto item: inData) {
-            list.push_back(Item(item));
-        }
-
-        return list;
-    }
-
     Item::List _items;
 };
 
@@ -130,15 +120,15 @@ int sumOfPriorities(Item::List items)
 class ElfGroup
 {
 public:
-    ElfGroup(Rucksack::List rucksacks) {
+    explicit ElfGroup(const Rucksack::List& rucksacks) {
         for (auto& rs: rucksacks)
         {
             _rucksacks.push_back(SortedRucksack(rs));
         }
     }
 
-    Item getBadge() const {
-        auto intersectionBuilder = [](Item::List&& intersection, SortedRucksack rs){
+    [[nodiscard]] Item getBadge() const {
+        auto intersectionBuilder = [](Item::List&& intersection, const SortedRucksack& rs){
             Item::List newIntersection;
             std::set_intersection(intersection.begin(), intersection.end(),
                                   rs.getItems().begin(), rs.getItems().end(),
@@ -158,7 +148,7 @@ class Rucksacks
 {
 public:
     using ElfGroups = std::vector<ElfGroup>;
-    Rucksacks(const std::string& in) {
+    explicit Rucksacks(const std::string& in) {
         _rsl = parseStringData(in);
     }
 
@@ -190,7 +180,7 @@ public:
     }
 
 private:
-    Rucksack::List parseStringData(const std::string& inData)
+    static Rucksack::List parseStringData(const std::string& inData)
     {
         Rucksack::List result;
         auto ss = std::stringstream{inData};
@@ -214,4 +204,4 @@ int sumOfGroupBadges(Rucksacks::ElfGroups egs)
     return sum;
 }
 
-#endif //ADVENTOFCODE2022_DAY_3_H
+#endif //ADVENT_OF_CODE_2022_DAY_3_H

@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_13_H
-#define ADVENTOFCODE2022_DAY_13_H
+#ifndef ADVENT_OF_CODE_2022_DAY_13_H
+#define ADVENT_OF_CODE_2022_DAY_13_H
 
 #include <vector>
 #include <string>
@@ -90,7 +90,7 @@ namespace Day13 {
                 else if (in[0] == ',')
                     in = in.substr(1);
                 else {
-                    // Else we have a new valu
+                    // Else we have a new value
                     auto elemStr = in.substr(0, nextIndex);
                     in = in.substr(nextIndex);
                     auto elem = static_cast<int>(stoi(elemStr));
@@ -285,4 +285,4 @@ private:
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_13_H
+#endif //ADVENT_OF_CODE_2022_DAY_13_H

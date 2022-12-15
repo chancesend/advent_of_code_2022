@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_5_H
-#define ADVENTOFCODE2022_DAY_5_H
+#ifndef ADVENT_OF_CODE_2022_DAY_5_H
+#define ADVENT_OF_CODE_2022_DAY_5_H
 
 #include <vector>
 #include <string>
@@ -35,11 +35,11 @@ namespace Day5 {
 
         CrateStacks() = default;
 
-        CrateStacks(const std::string& in) : _stacks(parseStringData(in)) {}
+        explicit CrateStacks(const std::string& in) : _stacks(parseStringData(in)) {}
 
-        Stack getStack(int i) const { return _stacks[i]; }
+        [[nodiscard]] Stack getStack(int i) const { return _stacks[i]; }
 
-        std::string getTopOfStacks() const {
+        [[nodiscard]] std::string getTopOfStacks() const {
             auto tosStr = std::accumulate(_stacks.begin(), _stacks.end(), std::string(""), [](std::string&& str, const Stack& stack) {
                 str += stack.top();
                 return str;
@@ -80,7 +80,7 @@ namespace Day5 {
                 stackNums.push_back(num);
             }
 
-            auto numStacks = stackNums.size();
+            auto numStacks = static_cast<int>(stackNums.size());
             return numStacks;
         }
 
@@ -101,7 +101,7 @@ namespace Day5 {
             StringLines stringDeque;
             auto ss = std::stringstream{inData};
             for (std::string line; std::getline(ss, line, '\n');) {
-                if (line != "")
+                if (!line.empty())
                     stringDeque.push_front(line);
             }
             auto numStacks = getNumStacksFromLine(stringDeque.front());
@@ -135,11 +135,11 @@ namespace Day5 {
 
         Moves() = default;
 
-        Moves(const std::string& in) : _moves(parseStringData(in)) {
+        explicit Moves(const std::string& in) : _moves(parseStringData(in)) {
 
         }
 
-        MoveList getMoveList() const { return _moves; }
+        [[nodiscard]] MoveList getMoveList() const { return _moves; }
 
     private:
         static MoveList parseStringData(const std::string& inData) {
@@ -177,7 +177,7 @@ namespace Day5 {
         MoveList _moves;
     };
 
-    CrateStacks doMoves(CrateStacks stacks, Moves moves, Move::Type type) {
+    CrateStacks doMoves(CrateStacks stacks, const Moves& moves, Move::Type type) {
         for (const auto &move: moves.getMoveList()) {
             stacks.doMove(move, type);
         }
@@ -191,7 +191,7 @@ namespace Day5 {
             _stacks = doMoves(_stacks, _moves, type);
         };
 
-        std::string getTopOfStacks() const {
+        [[nodiscard]] std::string getTopOfStacks() const {
             return _stacks.getTopOfStacks();
         }
 
@@ -215,4 +215,4 @@ namespace Day5 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_5_H
+#endif //ADVENT_OF_CODE_2022_DAY_5_H

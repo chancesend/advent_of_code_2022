@@ -2,9 +2,11 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_11_H
-#define ADVENTOFCODE2022_DAY_11_H
+#ifndef ADVENT_OF_CODE_2022_DAY_11_H
+#define ADVENT_OF_CODE_2022_DAY_11_H
 
+#include <utility>
+#include <utility>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -34,19 +36,10 @@ namespace Day11 {
             _doDiv3 = doDiv3;
         }
 
-        Monkey(int num, ItemList startingItems, auto&& op, int divByTest, int throwTrue, int throwFalse) :
-            _num(num),
-            _items(startingItems),
-            _operation(op),
-            _divByTest(divByTest),
-            _throwMonkeyTrue(throwTrue),
-            _throwMonkeyFalse(throwFalse),
-            _doDiv3(true)
-        {
-        }
+        Monkey(int num, ItemList startingItems, auto&& op, int divByTest, int throwTrue, int throwFalse);
 
-        int getNumItems() {return _items.size();}
-        int getDivTest() {return _divByTest;}
+        int getNumItems() {return static_cast<int>(_items.size());}
+        [[nodiscard]] int getDivTest() const {return _divByTest;}
 
         std::pair<Item, int> inspectItem()
         {
@@ -80,7 +73,7 @@ namespace Day11 {
             _items.push(worryLevel);
         }
 
-        ItemCount getNumItemsInspected()
+        [[nodiscard]] ItemCount getNumItemsInspected() const
         {
             return _inspected;
         }
@@ -118,7 +111,7 @@ namespace Day11 {
         static int parseMonkeyNum(const std::string& in)
         {
             std::string monkeyDelimiter = "Monkey";
-            int monkeyNumIndex = in.find("Monkey") + monkeyDelimiter.length() + 1;
+            auto monkeyNumIndex = in.find("Monkey") + monkeyDelimiter.length() + 1;
             auto monkeyNumStr = in.substr(monkeyNumIndex, 1);
             auto monkeyNum = std::stoi(monkeyNumStr);
             return monkeyNum;
@@ -128,7 +121,7 @@ namespace Day11 {
         {
             ItemList items;
             std::string del = "Starting items:";
-            int index = in.find(del) + del.length() + 1;
+            auto index = in.find(del) + del.length() + 1;
             auto subIn = in.erase(0, index);
 
             auto ss = std::stringstream{subIn};
@@ -144,7 +137,7 @@ namespace Day11 {
         static OperationFcn parseOperation(const std::string& in)
         {
             std::string delimiter {"new = old"};
-            int opIdx = in.find(delimiter) + delimiter.length() + 1;
+            auto opIdx = in.find(delimiter) + delimiter.length() + 1;
             auto opStr = in.substr(opIdx, 1);
             auto param2Str = in.substr(opIdx + 2);
             int param2 {0};
@@ -177,7 +170,7 @@ namespace Day11 {
         static int parseDivTest(const std::string& in)
         {
             std::string del = "divisible by";
-            int index = in.find(del) + del.length() + 1;
+            auto index = in.find(del) + del.length() + 1;
             auto numStr = in.substr(index);
             auto num = std::stoi(numStr);
             return num;
@@ -186,7 +179,7 @@ namespace Day11 {
         static int parseOnTrue(const std::string& in)
         {
             std::string del = "throw to monkey";
-            int index = in.find(del) + del.length() + 1;
+            auto index = in.find(del) + del.length() + 1;
             auto numStr = in.substr(index);
             auto num = std::stoi(numStr);
             return num;
@@ -195,13 +188,12 @@ namespace Day11 {
         static int parseOnFalse(const std::string& in)
         {
             std::string del = "throw to monkey";
-            int index = in.find(del) + del.length() + 1;
+            auto index = in.find(del) + del.length() + 1;
             auto numStr = in.substr(index);
             auto num = std::stoi(numStr);
             return num;
         }
 
-        int _num;
         ItemList _items;
         OperationFcn _operation;
         int _divByTest;
@@ -212,13 +204,23 @@ namespace Day11 {
         bool _doDiv3;
     };
 
+    Monkey::Monkey(int num, Monkey::ItemList startingItems, auto &&op, int divByTest, int throwTrue, int throwFalse) :
+            _items(std::move(std::move(startingItems))),
+            _operation(op),
+            _divByTest(divByTest),
+            _throwMonkeyTrue(throwTrue),
+            _throwMonkeyFalse(throwFalse),
+            _doDiv3(true)
+    {
+    }
+
     class MonkeyBusiness
     {
     public:
         using MonkeyList = std::vector<Monkey>;
         using ItemCountList = std::vector<Monkey::ItemCount>;
 
-        MonkeyBusiness(const std::string& in, bool doDiv3 = true) : _monkeys(parseDataInput(in, doDiv3))
+        explicit MonkeyBusiness(const std::string& in, bool doDiv3 = true) : _monkeys(parseDataInput(in, doDiv3))
         {
         }
 
@@ -259,10 +261,10 @@ namespace Day11 {
             auto ss = std::stringstream{in};
 
             std::string line;
-            int monkeyBegin = 0;
+            size_t monkeyBegin = 0;
 
             const std::string monkeyDelimiter = "Monkey";
-            int monkeyEnd;
+            size_t monkeyEnd;
 
             int globalLcm = 1;
             while(std::getline(ss, line, '\n'))
@@ -296,4 +298,4 @@ namespace Day11 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_11_H
+#endif //ADVENT_OF_CODE_2022_DAY_11_H

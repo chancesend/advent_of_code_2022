@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_8_H
-#define ADVENTOFCODE2022_DAY_8_H
+#ifndef ADVENT_OF_CODE_2022_DAY_8_H
+#define ADVENT_OF_CODE_2022_DAY_8_H
 
 #include <vector>
 #include <string>
@@ -23,16 +23,6 @@ namespace Day8 {
     Dims getDims(const TreeMap& map)
     {
         return {map.rows(), map.cols()};
-    }
-
-    void updateVisibleMap(TreeMap& map, const TreeMap& dir)
-    {
-        TreeMap temp = map.binaryExpr(dir, [](int l, int r)
-        {
-            // Return true if tree is visible from any angle
-            return ((l > 0) || (r >= 0)) ? 1 : 0;
-        });
-        map = temp.eval();
     }
 
     int sumNumVisible(const TreeMap& map)
@@ -56,9 +46,6 @@ namespace Day8 {
             _treemapDims({_treemap.rows(), _treemap.cols()})
         {
         }
-
-        TreeMap treeMap() { return _treemap.eval();}
-        TreeMap visibleMap() { return _visibleMap.eval();}
 
         [[nodiscard]] int numVisibleTrees()
         {
@@ -95,7 +82,6 @@ namespace Day8 {
                 visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
                 auto strVis = toString(visibleThisDir);
                 auto strMap = toString(visibleMap);
-                std::cout << std::endl << "N:" << std::endl << strVis << std::endl << strMap;
             }
             // South
             {
@@ -112,7 +98,6 @@ namespace Day8 {
                 visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
                 auto strVis = toString(visibleThisDir);
                 auto strMap = toString(visibleMap.eval());
-                std::cout << std::endl << "S:" << std::endl << strVis << std::endl << strMap;
             }
             // West
             {
@@ -129,7 +114,6 @@ namespace Day8 {
                 visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
                 auto strVis = toString(visibleThisDir);
                 auto strMap = toString(visibleMap.eval());
-                std::cout << std::endl << "W:" << std::endl << strVis << std::endl << strMap;
             }
             // East
             {
@@ -146,7 +130,6 @@ namespace Day8 {
                 visibleMap = visibleMap.binaryExpr(visibleThisDir, visibleMapUpdateFcn);
                 auto strVis = toString(visibleThisDir);
                 auto strMap = toString(visibleMap.eval());
-                std::cout << std::endl << "E:" << std::endl << strVis << std::endl << strMap;
             }
 
             int numVisible = sumNumVisible(visibleMap.eval());
@@ -232,8 +215,8 @@ namespace Day8 {
 
             int row = 0;
             for (std::string line; std::getline(ss, line, '\n');) {
-                auto cols = line.length();
-                Vec col(cols);
+                auto thisCols = line.length();
+                Vec col(thisCols);
                 int thisCol = 0;
                 for(auto chr: line)
                 {
@@ -256,7 +239,7 @@ namespace Day8 {
             int rows = 0;
             int cols = 0;
             for (std::string line; std::getline(ss, line, '\n');) {
-                cols = line.length();
+                cols = static_cast<int>(line.length());
                 Vec col(cols);
                 rows++;
             }
@@ -270,4 +253,4 @@ namespace Day8 {
     };
 }
 
-#endif //ADVENTOFCODE2022_DAY_8_H
+#endif //ADVENT_OF_CODE_2022_DAY_8_H

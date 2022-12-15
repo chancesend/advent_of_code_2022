@@ -2,8 +2,8 @@
 // Created by Ryan Avery on 12/6/2022.
 //
 
-#ifndef ADVENTOFCODE2022_DAY_7_H
-#define ADVENTOFCODE2022_DAY_7_H
+#ifndef ADVENT_OF_CODE_2022_DAY_7_H
+#define ADVENT_OF_CODE_2022_DAY_7_H
 
 #include <vector>
 #include <string>
@@ -25,11 +25,10 @@ namespace Day7 {
         };
         using Files = std::vector<File>;
         using Dirs = std::vector<Dir>;
-        using DirContents = std::vector<std::string>;
 
         Dir(const std::string& name, Dir* parent) : _name(name), _parent(parent) {}
 
-        int getSize() const
+        [[nodiscard]] int getSize() const
         {
             auto size = std::accumulate(_files.begin(), _files.end(), 0, [](int&& acc, const File& file){
                 acc += file.size;
@@ -41,12 +40,12 @@ namespace Day7 {
             });
             return size;
         }
-        const std::string& getName() const
+        [[nodiscard]] const std::string& getName() const
         {
             return _name;
         }
 
-        const Dirs& subDirs() const
+        [[nodiscard]] const Dirs& subDirs() const
         {
             return _subdirs;
         }
@@ -59,13 +58,14 @@ namespace Day7 {
         void mk(const std::string& name, int size)
         {
             _files.push_back(File{name, size});
-            return;
         }
+
         Dir* mkDir(const std::string& name)
         {
             _subdirs.push_back(Dir(name, this));
             return &_subdirs.back();
         }
+
         Dir* subdir(const std::string& name)
         {
             if (name == "..")
@@ -138,7 +138,7 @@ namespace Day7 {
         using DirectorySize = std::pair<std::string, int>;
         using DirectorySizeList = std::vector<DirectorySize>;
 
-        DirectoryBrowser(const std::string& in) : _fileSystem() {
+        explicit DirectoryBrowser(const std::string& in) : _fileSystem() {
             parseStringData(in);
         }
 
@@ -185,8 +185,6 @@ namespace Day7 {
             }
             // Reset to root
             _fileSystem.cd("/");
-
-            return;
         }
 
         static bool getCommand(const std::string& line, std::string& cmd)
@@ -210,7 +208,7 @@ namespace Day7 {
             return response;
         }
 
-        void parseCommand(const std::string& cmdLine, TerminalLineList response)
+        void parseCommand(const std::string& cmdLine, const TerminalLineList& response)
         {
             auto cmd = cmdLine.substr(0, kCD.length());
             if (cmd == kCD)
@@ -224,7 +222,7 @@ namespace Day7 {
             }
         }
 
-        void parseLsCommand(TerminalLineList response)
+        void parseLsCommand(const TerminalLineList& response)
         {
             const std::string kDir{"dir"};
             for (const auto& line: response)
@@ -236,9 +234,9 @@ namespace Day7 {
                 }
                 else
                 {   // Is a file
-                    auto sizeStr = line.substr(0, line.find(" "));
+                    auto sizeStr = line.substr(0, line.find(' '));
                     auto size = std::stoi(sizeStr);
-                    auto name = line.substr(line.find(" "));
+                    auto name = line.substr(line.find(' '));
                     _fileSystem.curdir()->mk(name, size);
                 }
             }
@@ -260,7 +258,7 @@ namespace Day7 {
         return 0;
     }
 
-    int getSizeOfDirectoriesAtMost(DirectoryBrowser::DirectorySizeList dsl, int maxSize)
+    int getSizeOfDirectoriesAtMost(const DirectoryBrowser::DirectorySizeList& dsl, int maxSize)
     {
         auto size = std::accumulate(dsl.cbegin(), dsl.cend(), 0,
                                     [maxSize](int acc, const DirectoryBrowser::DirectorySize& dir) -> int {
@@ -291,4 +289,4 @@ namespace Day7 {
 
 }
 
-#endif //ADVENTOFCODE2022_DAY_7_H
+#endif //ADVENT_OF_CODE_2022_DAY_7_H

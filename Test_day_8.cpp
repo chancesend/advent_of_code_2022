@@ -24,7 +24,6 @@ namespace Day8 {
 
     TEST_F(TestDay8, GetVisibleTrees) {
         auto visible = tv.numVisibleTrees();
-        std::cout << toString(tv.visibleMap());
         ASSERT_EQ(visible, 21);
     }
 
